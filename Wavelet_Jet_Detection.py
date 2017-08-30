@@ -8,7 +8,8 @@
 # and a series of methods called from a the wrapper detect_jets that 
 # that implement the jet detection methodology.
 # 
-# This program requires numpy, scipy and the pywavelets package
+# This program requires numpy, scipy and the pywavelets package:
+# https://github.com/PyWavelets/
 #
 # The algorithm has been tested on both gridded data from AVISO, as well 
 # as the along-track data, but when using the along track data, one must 
