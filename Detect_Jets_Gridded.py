@@ -11,10 +11,10 @@ EARTH_RADIUS = 6380.0e3
 # WAVELET PARAMETERS
 
 N_DECOMP_LEVELS = 4
-confidence_param = 0.90
+confidence_param = 0.8
 
-START_YEAR = 2007
-END_YEAR   = 2008
+START_YEAR = 2010
+END_YEAR   = 2011
 
 base_sla_path = '/home/cchlod/AVISO/AVISO_Gridded_2/'
 base_mdt_path = '/home/cchlod/AVISO/'
@@ -28,15 +28,17 @@ lat         = dataset_mdt.variables['lat'][:]
 lon         = dataset_mdt.variables['lon'][:]
 mdt         = dataset_mdt.variables['mdt'][:,:,:]
 
+grad_thres = 0.15
 
-
-wavelet_jet_detector = Wavelet_Jet_Detection.Jet_Detector('haar',N_DECOMP_LEVELS,confidence_param)
+wavelet_jet_detector = Wavelet_Jet_Detection.Jet_Detector(N_DECOMP_LEVELS,confidence_param,wavelet_basis='haar',
+                       grad_thresh=grad_thres)
 
 
 time_counter = 0
 for i_year in range(START_YEAR,END_YEAR):
-    
-    dataset_out        = Dataset(base_sla_path+output_file_name+str(i_year)+'.nc','w',clobber=True, format='NETCDF4')
+    print base_sla_path+output_file_name+'thres_' + str(grad_thres) + '_' + str(i_year)+'.nc'
+    dataset_out        = Dataset(base_sla_path+output_file_name+'thres_' + str(grad_thres) + '_' + str(i_year)+'.nc',
+                                'w',clobber=True, format='NETCDF4')
     dataset_out.createDimension('time', None)
     var_time = dataset_out.createVariable('time', 'f8', ['time'])
 
@@ -63,7 +65,7 @@ for i_year in range(START_YEAR,END_YEAR):
     var_lon = dataset_out.createVariable('lon', 'f8', ['lon'])
     var_lat[:] = lat
     var_lon[:] = lon
-        #var_hist = dataset_out.createVariable('jet_loc_hist', 'f8', ['lat','lon'])
+    var_hist = dataset_out.createVariable('jet_loc_hist', 'f8', ['lat','lon'])
     var_locations = dataset_out.createVariable('jet_locations', 'f8', ['time','lat','lon'])
 
     sla         = dataset_sla.variables['sla'][:,:,:]
@@ -73,7 +75,7 @@ for i_year in range(START_YEAR,END_YEAR):
     jet_locations = np.zeros([nT,n_lat,n_lon],dtype='u4')
 
     var_time[time_counter:time_counter+nT] = time
-    adt = mdt + sla
+    adt = mdt + 1.0e-4*sla
     
     for iT in range(0,nT):
         print "time step: ", iT, " of ", nT
@@ -85,7 +87,7 @@ for i_year in range(START_YEAR,END_YEAR):
             lat_slice[np.isnan(adt_slice)] = np.nan
         
             lon_positions, lat_positions = wavelet_jet_detector.detect_jets(lon[i_lon]*np.ones(n_lat), lat_slice,adt_slice)
-
+            dsda
             
             for i_jet in range(0,len(lat_positions)):
                 index_y = np.nonzero(lat>=lat_positions[i_jet])[0][0]     
