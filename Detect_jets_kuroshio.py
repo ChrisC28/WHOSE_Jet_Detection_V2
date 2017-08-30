@@ -3,6 +3,17 @@ from matplotlib import pyplot as plt
 from netCDF4 import Dataset
 import Wavelet_Jet_Detection
 
+#============================================================================#
+#This is an example script showing how to use, and save, the WHOSE jet detection
+#alogorithm. The example uses AVISO gridded altimetry (ADT) in the north Pacific region
+#with a focus on the Kuroshio current. The example ADT file can be downloaded 
+# from:
+# https://www.dropbox.com/s/p2ygo43odrsyjwx/adt_Kuroshio_2010.nc?dl=0
+# 
+# You'll need NetCDF4 to read the netcdf files
+# http://unidata.github.io/netcdf4-python/
+#============================================================================#
+
 #=========================#
 # WAVELET PARAMETERS
 #=========================#
@@ -35,9 +46,7 @@ output_file_stem = 'jet_detection_Kuroshio_'
 #==========================#
 wavelet_jet_detector = Wavelet_Jet_Detection.Jet_Detector(N_DECOMP_LEVELS,confidence_param,wavelet_basis='haar',
                        grad_thresh=grad_thres)
-
-
-
+#==========================#                    
 #some counters
 time_counter = 0
 start_lon = 0

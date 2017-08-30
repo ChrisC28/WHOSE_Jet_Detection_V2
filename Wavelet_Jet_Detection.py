@@ -2,29 +2,26 @@
 #========================================================================#
 # Wave_Jet_Detection
 # This class implements the1D version of the wavelet edge detection 
-# method described in Chapman 2014 and used in Chapman 2016
+# method described in Chapman 2014 and used in Chapman 2017
 #
-# The class consists of a basic constructor that 
+# The class consists of a basic constructor that instantiates the class
+# and a series of methods called from a the wrapper detect_jets that 
+# that implement the jet detection methodology.
+# 
+# This program requires numpy, scipy and the pywavelets package
 #
 # The algorithm has been tested on both gridded data from AVISO, as well 
 # as the along-track data, but when using the along track data, one must 
 # be carefull near the poles, as the satellite tracks tend to become very
 # zonally oriented. 
-
-
-#
 #========================================================================#
 
 import numpy as np
 from matplotlib import pyplot as plt
-from scipy.stats import norm, uniform, kurtosis, rankdata
-#import PDF_Tools as PDF_Tools
-#from scipy.signal import detrend
+from scipy.stats import kurtosis
 import pywt
 import math
-import scipy.signal
 from scipy import interpolate
-import peakutils
 
 
 class Jet_Detector:
