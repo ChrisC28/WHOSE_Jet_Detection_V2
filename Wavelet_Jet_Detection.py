@@ -247,11 +247,9 @@ class Jet_Detector:
         # includes thresholding operations.  
         #====================================================================#
         
-        indicies = self.__detect_peaks(np.abs(grad_denoised), mph=self.grad_thres, mpd=5, threshold=0.01*self.grad_thres, 
+        indicies = self.__detect_peaks(np.abs(grad_denoised), mph=self.grad_thres, mpd=5, threshold=0, 
                                         edge='rising', kpsh=False, valley=False)
         
-        
-        indicies = [index_element+3 for index_element in indicies]
         
         #====================================================================#
         #Step 8: Rejection of negative velocities
@@ -266,34 +264,39 @@ class Jet_Detector:
                 
                 elif -np.sign(np.nanmean(lat_grid))*np.diff(denoised_signal)[indicies[i_jet]-1]<0:
                     indicies_to_remove.append(i_jet)
-        
-            for i in sorted(indicies_to_remove, reverse=True):
-                del indicies[i]
-        
+            if indicies_to_remove:
+                indicies=np.delete(indicies, indicies_to_remove)
                 
+            #for i in sorted(indicies_to_remove, reverse=True):
+            #    print i
+            #    print indicies
+            #    del indicies[i]
+                
+        #END if only_westward
+        
+
+        indicies = [index_element+3 for index_element in indicies]
+        
         jet_lon_positions = lon_grid[indicies]
         jet_lat_positions = lat_grid[indicies]
         
-        jet_lat_position_orig_grid = np.zeros_like(jet_lat_positions)
-        jet_lon_position_orig_grid = np.zeros_like(jet_lon_positions)
+        jet_lat_position_orig_grid = []
+        jet_lon_position_orig_grid = []
 
         #Finally, we put the jet locations back on the original grid and
         #screen out any detected jets in masked regions. 
         
         for i_jet in range(0,len(jet_lat_positions)):
             idx = np.nonzero(lat_points>=jet_lat_positions[i_jet])[0][0]
-            
             if not(nan_mask[idx]):
-                jet_lat_position_orig_grid[i_jet] = lat_points[idx]
+                jet_lat_position_orig_grid.append(lat_points[idx])
+            
             idx = np.nonzero(lon_points>=jet_lon_positions[i_jet])[0][0]
-            
             if not(nan_mask[idx]):
-                jet_lon_position_orig_grid[i_jet] = lon_points[idx]
-        
-             
-        
+                jet_lon_position_orig_grid.append(lon_points[idx])
+                
         #Finally, return the jet latitude and longitudes
-        return jet_lon_position_orig_grid, jet_lat_position_orig_grid
+        return np.asarray(jet_lon_position_orig_grid), np.asarray(jet_lat_position_orig_grid)
         
     def __Kurtosis_Thresholding(self,wavelet_coefficients,south_index,north_index):
         
