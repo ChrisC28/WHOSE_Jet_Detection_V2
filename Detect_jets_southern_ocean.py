@@ -18,7 +18,7 @@ confidence_param = 0.9
 
 #============================#
 #Set the gradient threshold
-grad_thres = 0.001
+grad_thres = 0.001 #(units: m/km - reported in text as m/100km)
 #============================#
 
 #Start year and end year 
