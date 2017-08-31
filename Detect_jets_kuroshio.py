@@ -115,14 +115,30 @@ for i_year in range(START_YEAR,END_YEAR):
     dataset_adt.close()
     
     
-#Write the jet histogram to file 
-var_hist[:,:] = jet_histogram/float(time_counter)
-dataset_out.close()  
+    #Write the jet histogram to file 
+    var_hist[:,:] = jet_histogram/float(time_counter)
+    dataset_out.close()  
     
+    
+    
+topo_mask = np.isnan(adt[0,:,:])
+jet_histogram_masked = np.ma.masked_where(topo_mask, jet_histogram)
+
 #Let's make some plots
 fig  = plt.figure(1)
 ax   = fig.add_subplot(1,1,1)
+ax.contourf(lon_adt,lat_adt,jet_histogram_masked.mask,2,cmap=plt.cm.gray_r)
 cs = ax.contourf(lon_adt,lat_adt,adt[0,:,:],25,cmap=plt.cm.jet)
 fig.colorbar(cs)
 ax.contour(lon_adt,lat_adt,jet_locations[0,:,:],2,colors='k')
+ax.set_title('ADT and jet locations on the 1st of Jan, 2010')
+
+
+fig  = plt.figure(2)
+ax   = fig.add_subplot(1,1,1)
+ax.contourf(lon_adt,lat_adt,jet_histogram_masked.mask,2,cmap=plt.cm.gray_r)
+
+cs = ax.contourf(lon_adt,lat_adt,jet_histogram_masked,25,cmap=plt.cm.hot_r)
+fig.colorbar(cs)
+ax.set_title('Jet location histograms for year 2010')
 plt.show()

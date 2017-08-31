@@ -109,7 +109,7 @@ for i_year in range(START_YEAR,END_YEAR):
     var_locations = dataset_out.createVariable('jet_locations', 'f8', ['time','lat','lon'])
     #============================#
     
-    for iT in range(0,nT):
+    for iT in range(0,50): # nT):
         print "time step: ", iT, " of ", nT
         for i_lon in range(start_lon,n_lon):
             adt_slice = adt[iT,:,i_lon]
@@ -132,13 +132,34 @@ for i_year in range(START_YEAR,END_YEAR):
     
         
     dataset_adt.close()
-var_hist[:,:] = jet_histogram/float(time_counter)
-dataset_out.close()  
+    var_hist[:,:] = jet_histogram/float(time_counter)
+    dataset_out.close()  
+
+topo_mask = np.isnan(adt[0,:,:])
+jet_histogram_masked = np.ma.masked_where(topo_mask, jet_histogram)
+
 
 #Let's make some plots
 fig  = plt.figure(1)
 ax   = fig.add_subplot(1,1,1)
+ax.contourf(lon_adt,lat_adt,jet_histogram_masked.mask,2,cmap=plt.cm.gray_r)
+
 cs = ax.contourf(lon_adt,lat_adt,adt[0,:,:],25,cmap=plt.cm.jet)
 fig.colorbar(cs)
 ax.contour(lon_adt,lat_adt,jet_locations[0,:,:],2,colors='k')
+ax.set_title('ADT and jet locations on the 1st of Jan, 2010')
+ax.set_ylim([-70,-30])
+plt.show()
+
+
+
+fig  = plt.figure(2)
+ax   = fig.add_subplot(1,1,1)
+ax.contourf(lon_adt,lat_adt,jet_histogram_masked.mask,2,cmap=plt.cm.gray_r)
+
+cs = ax.contourf(lon_adt,lat_adt,jet_histogram_masked,25,cmap=plt.cm.hot_r)
+fig.colorbar(cs)
+ax.set_title('Jet location histograms for year 2010')
+ax.set_ylim([-70,-30])
+
 plt.show()
